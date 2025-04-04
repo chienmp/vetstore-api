@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductType {
+  MEDICINE
+  FEED
+}
+
+model Manufacturer {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  address   String?
+  phone     String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id                 Int           @id @default(autoincrement())
+  name               String
+  type               ProductType
+  unit               String        // Đơn vị đóng gói: "bao", "kg", "chai", "ống", v.v.
+  retailPrice        Float         // Giá bán lẻ theo đơn vị
+  wholesalePrice     Float         // Giá bán buôn
+  retailPricePerKg   Float?        // Giá bán lẻ theo kg (nếu áp dụng)
+  stock              Int
+  manufacturerId     Int
+  manufacturer       Manufacturer  @relation(fields: [manufacturerId], references: [id])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+}
